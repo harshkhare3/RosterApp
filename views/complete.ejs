@@ -1,0 +1,80 @@
+<%- include("./partials/header") %>
+
+<div class="container" id="vue">
+  <div class="card">
+    <div class="card-header"><strong>Task Completed by Team</strong></div>
+    <div class="card-body">
+      <p v-if="note != ''" class="text-center"><strong>{{note}}</strong></p>
+      <div v-if="note == ''" class="table-editable" >
+          <table class="table table-bordered table-responsive-md table-striped text-center">
+            <thead>
+              <tr>
+                <th class="text-center">Employee Name</th>
+                <th class="text-center">Employee Id</th>
+                <th class="text-center">Day</th>
+                <th class="text-center">Task</th>
+                <th class="text-center">Action</th>
+             </tr>
+           </thead>
+           <tbody>
+               <tr v-for="(item, index) in arr">
+                 <td class="pt-3-half"  contenteditable="false"><a class="text-primary" v-bind:href="'/users/'+item.id"><strong>{{item.firstName}} {{item.lastName}}</strong></a></td>
+                 <td class="pt-3-half"  contenteditable="false" v-html="item.id"></td>
+                 <td class="pt-3-half"  contenteditable="false" v-html=" item.day"></td>
+                 <td class="pt-3-half"  contenteditable="false" v-html="item.shift"></td>
+                 <td class="pt-3-half"  contenteditable="false"><button class="btn btn-sm danger-color" v-on:click="del(index)"><i class="fas fa-trash"></i></button></td>
+               </tr>
+           </tbody>
+         </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+     var app = new Vue({
+           el: '#vue',
+            data:{
+                arr:[],
+                note:''
+             },
+
+             mounted:function(){
+               this.employee() //method1 will execute at pageload
+            },
+
+         methods:{
+            employee: function(){
+                 var xhttp1 = new XMLHttpRequest();
+                 xhttp1.open('GET', "/users/:id/complete");
+                 xhttp1.onreadystatechange = function (){
+                 if (this.readyState == 4 && this.status == 200) {
+
+                    app.arr = JSON.parse(this.response);
+
+                    if (app.arr.length == 0){
+                        app.note = "No task finished by the team yet !"
+                    }
+                }
+             }
+            xhttp1.send();
+            },
+
+            del: function(index){
+                var day = app.arr[index].day;
+                var id  = app.arr[index].id;
+
+                 var xhttp1 = new XMLHttpRequest();
+                 xhttp1.open('DELETE', "/users/"+ id +"/deletetask");
+                 xhttp1.onreadystatechange = function (){
+                 if (this.readyState == 4 && this.status == 200) {
+                     window.location.href = "https://a3cadd84-decc-4b69-b167-d074f274aa24-ide.cs50.xyz/users/"+<%=user[0].userId%>+"/completetask"
+                 }
+                }
+                xhttp1.setRequestHeader("Content-type", "application/json");
+                xhttp1.send(JSON.stringify({ day:day}));
+            }
+         }
+     });
+</script>
+<%- include("./partials/footer") %>

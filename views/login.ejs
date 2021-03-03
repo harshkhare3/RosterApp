@@ -1,0 +1,52 @@
+<%- include("./partials/header") %>
+
+<div class="container">
+ <div class="card" style="width:30rem">
+  <div class="card-body">
+      <form action="/login" method="POST">
+           <h3 class="dark-grey-text text-center">
+                    <strong>Log In</strong>
+           </h3>
+                 <div class="md-form">
+                    <i class="fas fa-envelope prefix grey-text"></i>
+                    <input type="text" id="email" class="form-control" name="email" placeholder="Your email">
+                  </div>
+                  <div class="md-form">
+                    <i class="fas fa-key prefix grey-text"></i>
+                    <input  id="pass" class="form-control" name="password" type="password"  placeholder="Password">
+                  </div>
+                  <div class="text-center">
+                    <button class="btn btn-indigo">Login</button>
+                    
+                 <hr data-content="OR" class="hr-text">
+                 
+                 <div class=" d-flex justify-content-center align-items-center">
+                    <div class="g-signin2" data-onsuccess="onSignIn"></div>
+                 </div>
+                </div>
+       </form>
+      </div>
+    </div>
+</div>
+
+<script>
+  function onSignIn(googleUser) {
+      var id_token = googleUser.getAuthResponse().id_token;
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', '/tokensignin');
+
+      xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          window.location.href = "https://a3cadd84-decc-4b69-b167-d074f274aa24-ide.cs50.xyz/users/home";
+        } else  if (this.readyState == 4 && this.status == 401) {
+          window.location.href = "https://a3cadd84-decc-4b69-b167-d074f274aa24-ide.cs50.xyz/login";
+        }
+      };
+
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.send(JSON.stringify({'idtoken': id_token}));
+
+    }
+</script>
+<%- include('./partials/footer'); %>

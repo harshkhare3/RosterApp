@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+       <title>My Roster </title>
+       <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <!-- JS, Popper.js, and jQuery -->
+      <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+       <link rel="stylesheet"  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css"/>
+       <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
+       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+       <!-- Bootstrap core CSS -->
+       <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
+       <!-- Material Design Bootstrap -->
+       <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.0/css/mdb.min.css" rel="stylesheet">
+       <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+       <script src="https://apis.google.com/js/platform.js" async defer></script>
+       <meta name="google-signin-client_id" content="959039765263-q79iedk895c7gr6avr6q0k4f0d9qtrcp.apps.googleusercontent.com">
+       <link rel="stylesheet" href="/stylesheets/main.css">
+    </head>
+<body class="bg">
+  <nav class="navbar  navbar-expand-lg navbar-dark bg-dark scrolling-navbar">
+
+      <!-- Brand -->
+      <a class="navbar-brand" href="">
+        <strong>ROSTER</strong>
+      </a>
+
+      <!-- Collapse -->
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+        aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Links -->
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+        <!-- Left -->
+        <ul class="navbar-nav ml-auto">
+          <% if(user){ %>
+          <li class="nav-item">
+            <a class="nav-link" href="/users/home">Home
+            </a>
+          </li>
+        <% if(user[0].adminCode === process.env.ADMIN) {%>
+             <li class="nav-item">
+               <a class="nav-link" href="/users/<%=user[0].userId%>/manager/assign">Assign Task</a>
+             </li>
+              <li class="nav-item">
+               <a class="nav-link" href="/users/<%=user[0].userId%>/completetask">Task Status</a>
+             </li>
+          <% } %>
+           <li class="nav-item">
+          <a class="nav-link" href="/users/<%=user[0].userId%>"><%= user[0].firstName %></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" onclick="signOut();">Logout</a>
+          </li>
+        <% }
+         else{ %>
+          <li class="nav-item">
+            <a class="nav-link" href="/login">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/">Sign Up</a>
+          </li>
+        </ul>
+        <% }%>
+    </div>
+  </nav>
+
+<% if(error && error.length > 0){ %>
+   <div class="container">
+	    <div class="alert alert-danger" role="alert">
+            <%= error %>
+	    </div>
+   </div>
+<% } %>
+<% if(success && success.length > 0){ %>
+	<div class="container">
+		 <div class="alert alert-success" role="alert">
+             <%= success %>
+	    </div>
+    </div>
+<% } %>
+ <script>
+  $( document ).ready(function(){
+      gapi.load('auth2', function() {
+        gapi.auth2.init();
+      });
+  });
+
+ function signOut() {
+          var auth2 = gapi.auth2.getAuthInstance();
+          auth2.signOut().then(function () {
+            console.log('User signed out.');
+          });
+
+          var xhttp1 = new XMLHttpRequest();
+                 var arr=[];
+                 xhttp1.open('GET', "/logout");
+                 xhttp1.onreadystatechange = function (){
+                 if (this.readyState == 4 && this.status == 200) {
+                  window.location.href = "https://a3cadd84-decc-4b69-b167-d074f274aa24-ide.cs50.xyz/login";
+                }
+             }
+        xhttp1.send();
+
+      }
+  </script>
+

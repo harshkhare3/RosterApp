@@ -1,0 +1,286 @@
+<%- include("./partials/header") %>
+<div class="container" id="vue">
+<div class="row">
+  <div class="col-9">
+  <div class="card">
+   <h3 class="card-header text-center font-weight-bold text-uppercase py-4">Employee  Information</h3>
+   <div class="card-body">
+    <table class="table table-bordered table-responsive-md table-striped text-center">
+        <thead>
+          <tr>
+            <th class="text-center"><strong>Employee Name</strong></th>
+            <th class="text-center"><strong>Employee Id</strong></th>
+            <th class="text-center"><strong>Availaility</strong></th>
+            <th class="text-center"><strong>Add Task</strong></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item,index) in arr">
+            <td class="pt-3-half"  contenteditable="false"><a class="text-primary" v-bind:href="'/users/'+item.userId"><strong>{{ item.firstName }} {{ item.lastName }}</strong></a></td>
+            <td class="pt-3-half"  contenteditable="false"><p v-bind:id="index">{{ item.userId }}</p></td>
+            <td>
+              <span class="table-remove"><button type="button" data-toggle="collapse" href="#av"
+              class="btn btn-indigo btn-rounded btn-sm my-0" v-on:click="ava(index)">Show Avilability</span></button>
+            </td>
+            <td>
+              <span class="table-remove"><button type="button" data-toggle="modal" href="#add"
+              class="btn btn-unique btn-rounded btn-sm my-0" v-on:click="add(index)">Add Task</span></button>
+            </td>
+          </tr>
+        </tbody>
+    </table>
+  </div>
+ </div>
+ </div>
+
+ <div class="col-3">
+   <div class="collapse" id="av">
+      <div class="card elegant-color white-text">
+           <div class="card-body">
+             <p>Availability :-</p>
+             <p>Monday - {{ava_m}}</p>
+             <p>Tuesday - {{ava_tu}}</p>
+             <p>Wednesday - {{ava_w}}</p>
+             <p>Thursday - {{ava_th}}</p>
+             <p>Friday - {{ava_f}}</p>
+             <hr class="white">
+             <p>Tasks :-</p>
+             <p>{{ava_task1 }}</p>
+             <p>{{ava_task2 }}</p>
+             <p>{{ava_task3 }}</p>
+           </div>
+      </div>
+   </div>
+ </div>
+</div>
+ <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#show" aria-expanded="false"
+      data-toggle="collapse" v-on:click="show()" aria-controls="collapseExample"> Show Roster </button>
+<div class="card collapse" id="show">
+    <h3 class="card-header text-center font-weight-bold text-uppercase py-4">Show task</h3>
+  <div class="card-body" >
+
+      <div class="table-editable" >
+          <table class="table table-bordered table-responsive-md table-striped text-center">
+            <thead>
+              <tr>
+                <th class="text-center"><strong>Employee Name</strong></th>
+                <th class="text-center"><strong>Employee Id</strong></th>
+                <th class="text-center"><strong>Monday</strong></th>
+                <th class="text-center"><strong>Tuesday</strong></th>
+                <th class="text-center"><strong>Wednesday</strong></th>
+                <th class="text-center"><strong>Thursday</strong></th>
+                <th class="text-center"><strong>Friday</strong></th>
+             </tr>
+           </thead>
+           <tbody>
+               <tr v-for="(item, index) in arr2">
+                 <td class="pt-3-half"  contenteditable="false"><a class="text-primary" v-bind:href="'/users/'+item.id"><strong>{{item.firstName}} {{item.lastName}}</strong></a></td>
+                 <td class="pt-3-half"  contenteditable="false" >{{ item.id }}</td>
+                 <td class="pt-3-half"  contenteditable="false" v-html="item.Monday"></td>
+                 <td class="pt-3-half"  contenteditable="false" v-html="item.Tuesday"></td>
+                 <td class="pt-3-half"  contenteditable="false" v-html="item.Wednesday"></td>
+                 <td class="pt-3-half"  contenteditable="false" v-html="item.Thursday"></td>
+                 <td class="pt-3-half"  contenteditable="false" v-html="item.Friday"></td>
+               </tr>
+           </tbody>
+         </table>
+        </div>
+      </div>
+    </div>
+<div class="modal fade" id="add" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Add Task</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+        <div class="modal-body mx-3">
+           <div class="md-form mb-5">
+             <i class="fas fa-user prefix grey-text"></i>
+             <input type="text" class="form-control" placeholder="User Id" v-model="id" >
+           </div>
+            <span id="day_icon"><i class="fas fa-calendar fa-2x grey-text"></i></span>
+            <label for="cars">Select a Day:</label>
+             <select name="cars" id="cars" v-model="day">
+               <option value="Monday">Monday</option>
+               <option value="Tuesday">Tuesday</option>
+               <option value="Wednesday">Wednesday</option>
+               <option value="Thursday">Thursday</option>
+               <option value="Friday">Friday</option>
+             </select>
+           <div class="md-form mb-4">
+             <i class="fas fa-clock prefix grey-text"></i>
+             <input type="text" v-model="time" placeholder="Start Time - End Time" class="form-control">
+           </div>
+           <div class="container">
+            <div class="custom-control custom-radio custom-control-inline">
+              <input type="radio" value="Front-End" class="custom-control-input" id="defaultInline1" name="inlineDefaultRadiosExample" v-model="front">
+              <label class="custom-control-label" for="defaultInline1">Front-End</label>
+            </div>
+            <div class="custom-control custom-radio custom-control-inline">
+              <input type="radio" value="Back-End" class="custom-control-input" id="defaultInline2" name="inlineDefaultRadiosExample" v-model="back">
+              <label class="custom-control-label" for="defaultInline2">Back-End</label>
+            </div>
+            <div class="custom-control custom-radio custom-control-inline">
+              <input type="radio" value="Helper" class="custom-control-input" id="defaultInline3" name="inlineDefaultRadiosExample" v-model="help">
+              <label class="custom-control-label" for="defaultInline3">Helper</label>
+            </div>
+           </div>
+           <div class="md-form mb-4">
+             <i class="fas fa-pen prefix grey-text"></i>
+             <textarea id="orangeForm-duty" rows="3"  v-model="additional" class="md-textarea" placeholder="Additional Task Remark"></textarea>
+           </div>
+           <div class="d-flex justify-content-center">
+             <button class="btn btn-deep-orange" data-dismiss="modal" v-on:click="task()">Submit</button>
+           </div>
+        </div>
+       </div>
+    </div>
+  </div>
+</div>
+
+<script>
+     var app = new Vue({
+           el: '#vue',
+            data:{
+                arr:[],
+                arr1:[],
+                arr2:[],
+                id:'',
+                day:'',
+                additional:'',
+                time:'',
+                front: '',
+                back:'',
+                help:'',
+                ava_m:'',
+                ava_tu:'',
+                ava_w:'',
+                ava_th:'',
+                ava_f:'',
+                ava_task1:'',
+                ava_task2:'',
+                ava_task3:'',
+                first:'',
+                last:'',
+                button_id:'',
+                i:''
+             },
+
+             mounted:function(){
+               this.employee() //method1 will execute at pageload
+
+
+            },
+
+         methods:{
+            employee: function(){
+                //  $('body').removeClass('bg');
+                 var xhttp1 = new XMLHttpRequest();
+                 xhttp1.open('GET', "/users");
+                 xhttp1.onreadystatechange = function (){
+                 if (this.readyState == 4 && this.status == 200) {
+
+                    app.arr = JSON.parse(this.response);
+                }
+             }
+            xhttp1.send();
+            },
+
+            add: function(index){
+                 app.id = document.getElementById(index).innerText;
+                 console.log(app.id);
+
+            },
+
+           task: function(){
+             if( app.front == '' && app.back == ''){
+                 console.log(1);
+                var duty = app.time + '<br>' + app.help + '<br>' + app.additional;
+             }
+              if( app.front == '' && app.help == ''){
+                var duty = app.time + '<br>' + app.back + '<br>' + app.additional;
+             }
+             else if(app.back == '' && app.help == ''){
+                var duty = app.time + '<br>' + app.front + '<br>'+ app.additional;
+
+             }
+             else if( app.front == '' && app.help == '' && app.back == ''){
+                var duty = app.time + '<br>' + app.additional;
+             }
+              console.log(duty);
+              var xhttp = new XMLHttpRequest();
+              xhttp.open('POST', "/users/" + app.id +"/shifts");
+              xhttp.onreadystatechange = function(){
+              if(this.readyState ==4 && this.status == 400) {
+                    window.location.href = "https://a3cadd84-decc-4b69-b167-d074f274aa24-ide.cs50.xyz/users/<%=user[0].userId%>/manager/assign"
+                  }
+              else if(this.readyState ==4 && this.status == 200) {
+                    window.location.href = "https://a3cadd84-decc-4b69-b167-d074f274aa24-ide.cs50.xyz/users/<%=user[0].userId%>/manager/assign"
+                  }
+              }
+            xhttp.setRequestHeader("Content-type", "application/json");
+            xhttp.send(JSON.stringify({ id:app.id , day:app.day, duty:duty }));
+                app.id ='';
+                app.day ='';
+                app.time='';
+                app.front = false;
+                app.back = false;
+                app.help = false;
+                app.additional = '';
+           },
+
+           ava: function(index){
+             var xhttp1 = new XMLHttpRequest();
+             app.id = document.getElementById(index).innerText;
+            //  console.log(app.id);
+                 xhttp1.open('GET', "/users/"+ app.id +"/availability");
+                 xhttp1.onreadystatechange = function (){
+                 if (this.readyState == 4 && this.status == 200) {
+
+                    app.arr1 = JSON.parse(this.response);
+                    if(app.arr1.length == 0){
+                        app.ava_m = '';
+                        app.ava_tu = '';
+                        app.ava_w = '';
+                        app.ava_th = '';
+                        app.ava_f = '';
+                        app.ava_task1 = '';
+                        app.ava_task2 = '';
+                        app.ava_task3 = '';
+                    }
+
+                    else{
+                        app.ava_m = app.arr1[0].mon;
+                        app.ava_tu = app.arr1[0].tue;
+                        app.ava_w = app.arr1[0].wed;
+                        app.ava_th = app.arr1[0].thu;
+                        app.ava_f = app.arr1[0].fri;
+                        app.ava_task1 = app.arr1[0].task1;
+                        app.ava_task2 = app.arr1[0].task2;
+                        app.ava_task3 = app.arr1[0].task3;
+                    }
+                }
+             }
+            xhttp1.send();
+           },
+
+           show: function(){
+              var xhttp1 = new XMLHttpRequest();
+                 xhttp1.open('GET', "/users/:id/allshifts");
+                 xhttp1.onreadystatechange = function (){
+                 if (this.readyState == 4 && this.status == 200) {
+
+                    app.arr2 = JSON.parse(this.response);
+                    // console.log(app.arr2);
+                }
+             }
+            xhttp1.send();
+           }
+         }
+      });
+
+</script>
+<%- include('./partials/footer') %>

@@ -1,0 +1,127 @@
+<%- include("./partials/header") %>
+
+<div class="container" id="vue">
+    <div class="card">
+        <div class="card-header">
+           <strong>Manage Availabilities and Tasks</strong>
+        </div>
+
+        <div class="card-body">
+        <h5 class="card-title"><strong>Change Availability</strong></h5>
+            <p>To change your availability, enter the time you are free to work.<br>
+            For eg.- If you are available from 9am to 5pm on Monday, enter 9.00-17.00.<br>
+            If you are not free on any particular day, leave the column blank.
+            </p>
+            <div class="d-flex justify-content-center">
+                <div class="col-2">
+                    <input type="text" v-model="mon" class="form-control"  placeholder="Monday">
+                  </div>
+                   <div class="col-2">
+                    <input type="text" v-model="tue" class="form-control"  placeholder="Tuesday">
+                  </div>
+                   <div class="col-2">
+                    <input type="text" v-model="wed" class="form-control"  placeholder="Wednesday">
+                  </div>
+                  <div class="col-2">
+                    <input type="text" v-model="thu" class="form-control"  placeholder="Thursday">
+                  </div>
+                  <div class="col-2">
+                    <input type="text" v-model="fri" class="form-control"  placeholder="Friday">
+                  </div>
+            </div>
+        <h5 class="card-title" style="margin-top:1em"><strong>Manage Task</strong></h5>
+          <div class="">
+              <div class="custom-control custom-checkbox">
+                 <input type="checkbox" value="Front-end" v-model="task1" class="custom-control-input" id="task1">
+              <label class="custom-control-label" for="task1">Front-end</label>
+             </div>
+             <div class="custom-control custom-checkbox">
+                 <input type="checkbox" value="Back-end" v-model="task2" class="custom-control-input" id="task2">
+              <label class="custom-control-label" for="task2">Back-end</label>
+             </div>
+             <div class="custom-control custom-checkbox">
+                 <input type="checkbox" value="Helper" v-model="task3" class="custom-control-input" id="task3">
+              <label class="custom-control-label" for="task3">Helper</label>
+             </div>
+          </div>
+          <button type="button" class="btn btn-success float-right" v-on:click="edit();">Edit</button>
+        </div>
+    </div>
+</div>
+
+<script>
+      var app = new Vue({
+                el: '#vue',
+                data: {
+                    arr:[],
+                    mon:'',
+                    tue:'',
+                    wed:'',
+                    thu:'',
+                    fri:'',
+                    task1: false,
+                    task2: false,
+                    task3: false,
+                },
+                mounted:function(){
+                 this.show() //method1 will execute at pageload
+                },
+                methods: {
+                    show: function(){
+                         var xhttp1 = new XMLHttpRequest();
+                         xhttp1.open('GET', "/users/<%=user[0].userId%>/availability");
+                         xhttp1.onreadystatechange = function (){
+                         if (this.readyState == 4 && this.status == 200) {
+                               app.arr = JSON.parse(this.response);
+
+                               app.mon   = app.arr[0].mon;
+                               app.tue   = app.arr[0].tue;
+                               app.wed   = app.arr[0].wed;
+                               app.thu   = app.arr[0].thu;
+                               app.fri   = app.arr[0].fri;
+                               if(app.arr[0].task1 != ''){
+                                  app.task1 = true;
+                               }
+                                if(app.arr[0].task2 != ''){
+                                  app.task2 = true;
+                               }
+                                if(app.arr[0].task3 != ''){
+                                  app.task3 = true;
+                               }
+                         }
+                     }
+                      xhttp1.send();
+                    },
+                    edit: function(){
+                        var task1='';
+                        var task2='';
+                        var task3='';
+
+                        if(app.task1 == true){
+                            var task1 = "Front-end";
+                        }
+                        if(app.task2 == true){
+                            var task2 = "Back-end";
+                        }
+                        if(app.task3 == true){
+                            var task3 = "Helper";
+                        }
+                        var xhttp = new XMLHttpRequest();
+                        xhttp.open('POST', "/users/<%=user[0].userId%>/availability");
+                        xhttp.onreadystatechange = function(){
+                        if(this.readyState ==4 && this.status == 200) {
+                          window.location.href = "https://a3cadd84-decc-4b69-b167-d074f274aa24-ide.cs50.xyz/users/<%=user[0].userId%>";
+                       }
+                       else if(this.readyState ==4 && this.status == 400){
+                          window.location.href = "https://a3cadd84-decc-4b69-b167-d074f274aa24-ide.cs50.xyz/login";
+                       }
+                   };
+                   xhttp.setRequestHeader("Content-type", "application/json");
+                   xhttp.send(JSON.stringify({ mon:app.mon, tue:app.tue, wed:app.wed, thu:app.thu, fri:app.fri, task1:task1, task2:task2, task3:task3 }));
+           }
+        }
+      });
+</script>
+
+<%- include('./partials/footer') %>
+

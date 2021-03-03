@@ -1,0 +1,83 @@
+<%- include("./partials/header") %>
+<div class="mask d-flex justify-content-center align-items-center">
+<div class="col-md-6 col-xl-5 p-5">
+
+            <div class="card">
+
+              <div class="card-body">
+
+                <form action="/register" method="POST">
+                  <h3 class="dark-grey-text text-center">
+                    <strong>Sign Up</strong>
+                  </h3>
+                  <hr>
+                <div class="form-row mb-4 md-form">
+                   <div class="col">
+                    <i class="fas fa-user prefix grey-text"></i>
+                    <input type="text" id="FirstName" class="form-control" name="firstName">
+                    <label for="FirstName">First name</label>
+                   </div>
+                   <div class="col">
+                    <input type="text" id="LastName" class="form-control"  name="lastName">
+                    <label for="LastName">Last name</label>
+                   </div>
+                </div>
+                  <div class="md-form">
+                    <i class="fas fa-envelope prefix grey-text"></i>
+                    <input type="text" id="form1" class="form-control" name="email">
+                    <label for="form1">Your email</label>
+                  </div>
+                  <div class="md-form">
+                    <i class="fas fa-key prefix grey-text"></i>
+                    <input  id="form2" class="form-control" name="password" type="password">
+                    <label for="form2">Password</label>
+                  </div>
+
+                  <div class="md-form">
+                    <i class="fas fa-key prefix grey-text"></i>
+                    <input  id="form3" class="form-control" name="passwordConfirm" type="password">
+                    <label for="form3">Confirm Password</label>
+                  </div>
+                  <div class="md-form">
+                    <i class="fas fa-user-lock prefix grey-text"></i>
+                    <input type="password" id="form4" class="form-control" name="adminCode">
+                    <label for="form4">Admin Code</label>
+                  </div>
+
+                  <div class="text-center">
+                    <button class="btn btn-indigo">Sign Up</button>
+
+                    <hr data-content="OR" class="hr-text">
+
+                  <div class=" d-flex justify-content-center align-items-center">
+                    <div class="g-signin2" data-onsuccess="onSignIn"></div>
+                 </div>
+                </form>
+
+              </div>
+        </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function onSignIn(googleUser) {
+      var id_token = googleUser.getAuthResponse().id_token;
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', '/tokensignin');
+
+      xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          window.location.href = "https://a3cadd84-decc-4b69-b167-d074f274aa24-ide.cs50.xyz/users/home";
+        } else  if (this.readyState == 4 && this.status == 401) {
+          window.location.href = "https://a3cadd84-decc-4b69-b167-d074f274aa24-ide.cs50.xyz/login";
+        }
+      };
+
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.send(JSON.stringify({'idtoken': id_token}));
+
+    }
+</script>
+<%- include("./partials/footer") %>

@@ -1,0 +1,175 @@
+<%- include("./partials/header") %>
+<div class="container" id="vue">
+  <div class="card">
+    <h3 class="card-header text-center font-weight-bold text-uppercase py-4">Roster of this Week</h3>
+  <div class="card-body">
+
+      <div class="table-editable" >
+          <table class="table table-striped">
+            <thead class="black white-text">
+              <tr>
+                <th class="text-center">Employee Name</th>
+                <th class="text-center">Employee Id</th>
+                <th class="text-center">Monday</th>
+                <th class="text-center">Tuesday</th>
+                <th class="text-center">Wednesday</th>
+                <th class="text-center">Thursday</th>
+                <th class="text-center">Friday</th>
+             </tr>
+           </thead>
+           <tbody class="text-center">
+               <tr v-for="(item, index) in arr">
+                 <td class="pt-3-half"  contenteditable="false"><a class="text-primary" v-bind:href="'/users/'+item.id"><strong>{{item.firstName}} {{item.lastName}}</strong></a></td>
+                 <td class="pt-3-half"  contenteditable="false" v-html="item.id"></td>
+                 <td class="pt-3-half"  contenteditable="false" v-html=" item.Monday"></td>
+                 <td class="pt-3-half"  contenteditable="false" v-html="item.Tuesday"></td>
+                 <td class="pt-3-half"  contenteditable="false" v-html="item.Wednesday"></td>
+                 <td class="pt-3-half"  contenteditable="false" v-html="item.Thursday"></td>
+                 <td class="pt-3-half"  contenteditable="false" v-html="item.Friday"></td>
+               </tr>
+           </tbody>
+         </table>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+    <div class="col-3">
+
+    </div>
+    <div class="col-6">
+       <div class="card text-white bg-dark">
+           <div class="card-body text-center"><strong> NOTICE BOARD </strong></div>
+       </div>
+       <div class="card text-white bg-dark" v-for="(item,index) in arr1.slice().reverse()">
+        <div class="card-body">
+          <strong><a class="text-primary" v-bind:href="'/users/'+item.userId">{{item.firstName}} {{item.lastName}} (Manager)</a></strong>
+            <p v-html="item.post"></p>
+            <% if(user[0].adminCode == process.env.ADMIN){ %>
+            <a type="button" v-on:click="deleteNot(index);" class="float-right trash"><span><i class="fas fa-trash"></i></span></a>
+            <!--<a type="button" v-on:click="archiveNotice(index)" class="float-right"><span style="margin-right:10px"><i class="fas fa-eye-slash"></i></span></a>-->
+            <a type="button" v-on:click="ind(index)" data-toggle="modal" class="float-right edit" data-target="#edit"><span style="margin-right:10px"><i class="fas fa-pencil-alt"></i></span></a>
+            <% } %>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="edit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Edit Notice</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="md-form mb-4 pink-textarea active-pink-textarea-2">
+            <i class="fas fa-angle-double-right prefix"></i>
+            <textarea id="form23" class="md-textarea form-control not" v-model="notice" rows="5"></textarea>
+        </div>
+      </div>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" v-on:click="editNotice();">Save</button>
+    </div>
+  </div>
+
+</div>
+    <div class="col-3">
+
+    </div>
+    </div>
+
+</div>
+
+<script>
+    var app = new Vue({
+        el: '#vue',
+        data: {
+            arr:[],
+            arr1:[],
+            notice:'',
+            id:'',
+            oid:''
+          },
+
+        mounted:function(){
+               this.showRoster(), //method1 will execute at pageload
+               this.showNotice()
+          },
+
+        methods:{
+
+            ind: function(index){
+                app.id = index+1;
+                var length = app.arr1.length;
+                var pid = length + 1 - app.id;
+                var str = app.arr1[pid-1].post;
+                var regex = /<br\s*[\/]?>/gi;
+                var n1 = str.replace(regex, "\n");
+                console.log(n1);
+                app.notice = n1;
+            },
+
+            showRoster: function(){
+                 var xhttp1 = new XMLHttpRequest();
+                 xhttp1.open('GET', "/users/:id/allshifts");
+                 xhttp1.onreadystatechange = function (){
+                 if (this.readyState == 4 && this.status == 200) {
+
+                    app.arr = JSON.parse(this.response);
+                }
+             }
+            xhttp1.send();
+            },
+
+            showNotice: function(){
+                 var xhttp1 = new XMLHttpRequest();
+                 xhttp1.open('GET', "/users/<%=user[0].userId%>/notice");
+                 xhttp1.onreadystatechange = function (){
+                 if (this.readyState == 4 && this.status == 200) {
+
+                    app.arr1 = JSON.parse(this.response);
+                    // console.log(app.arr1);
+                }
+             }
+            xhttp1.send();
+            },
+
+            editNotice: function(){
+                 var not = app.notice;
+                 var notice = not.replace(/(?:\r\n|\r|\n)/g, '<br>');
+                 var length = app.arr1.length;
+                 var pid = length + 1 - app.id;
+                 app.oid = app.arr1[pid-1].id;
+                 console.log(app.oid);
+                 var xhttp1 = new XMLHttpRequest();
+                 xhttp1.open('PUT', "/users/<%=user[0].userId%>/notice/edit");
+                 xhttp1.onreadystatechange = function (){
+                 if (this.readyState == 4 && this.status == 200) {
+                    window.location.href = "https://a3cadd84-decc-4b69-b167-d074f274aa24-ide.cs50.xyz/users/home"
+                 }
+             }
+             xhttp1.setRequestHeader("Content-type", "application/json");
+             xhttp1.send(JSON.stringify({ notice:notice, id:app.oid }));
+            },
+
+            deleteNot: function(index){
+                 app.id = 0;
+                 app.id = index+1;
+                 var length = app.arr1.length;
+                 var pid = length + 1 - app.id;
+                 app.oid = app.arr1[pid-1].id;
+                 var xhttp1 = new XMLHttpRequest();
+                 xhttp1.open('DELETE', "/users/<%=user[0].userId%>/notice/delete");
+                 xhttp1.onreadystatechange = function (){
+                 if (this.readyState == 4 && this.status == 200) {
+                     window.location.href = "https://a3cadd84-decc-4b69-b167-d074f274aa24-ide.cs50.xyz/users/home"
+                 }
+             }
+             xhttp1.setRequestHeader("Content-type", "application/json");
+             xhttp1.send(JSON.stringify({ id:app.oid }));
+            },
+
+        }
+    });
+</script>
+<%- include("./partials/footer") %>

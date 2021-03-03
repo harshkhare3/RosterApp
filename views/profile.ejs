@@ -1,0 +1,434 @@
+<%- include("./partials/header") %>
+<div class="container">
+    <div class="row">
+        <div class="col-4">
+          <div class="card">
+            <div class="view overlay avatar-ctn">
+              <img class="card-img-top avatar" src="<%=currentUser[0].avatar%>" alt="Card image cap">
+               <a href="#!"><div class="mask rgba-white-slight"></div></a>
+            </div>
+            <hr>
+          <div class="card-body">
+           <h4 class="card-title"><%= currentUser[0].firstName %> <%= currentUser[0].lastName %></h4>
+           <p class="card-text"><%-currentUser[0].bio%></p>
+           <% if(user[0].userId == currentUser[0].userId){ %>
+            <button data-toggle="collapse" data-target="#add" class="btn btn-secondary">Edit &#160;<i class="fas fa-user-edit"></i></a>
+           <% } %>
+          </div>
+       </div>
+       <div class="card collapse" id="add">
+        <div class="card-body">
+            <div class="md-form mb-5">
+             <i class="fas fa-user prefix grey-text"></i>
+             <input type="text" id="first" value="<%=currentUser[0].firstName%>" class="form-control">
+             <label data-error="wrong" data-success="right" for="first">First Name</label>
+           </div>
+           <div class="md-form mb-5">
+             <i class="fas fa-user prefix grey-text"></i>
+             <input type="text" id="last" value="<%=currentUser[0].lastName%>" class="form-control">
+             <label data-error="wrong" data-success="right" for="last">Last Name</label>
+           </div>
+           <div class="md-form mb-5">
+             <i class="fas fa-envelope prefix grey-text"></i>
+             <input type="email" id="email" value="<%=currentUser[0].email%>" class="form-control">
+             <label data-error="wrong" data-success="right" for="email">Your email</label>
+           </div>
+            <div class="md-form mb-5">
+             <i class="fas fa-lock prefix grey-text"></i>
+             <input type="email" id="ac" class="form-control">
+             <label data-error="wrong" data-success="right" for="ac">Admin Code</label>
+           </div>
+           <div class="md-form mb-4">
+             <i class="fas fa-pen prefix grey-text"></i>
+             <textarea type="text" id="bio" class="md-textarea"><%=currentUser[0].bio%></textarea>
+             <label data-error="wrong" data-success="right" for="bio">Bio</label>
+          </div>
+          <div class="d-flex justify-content-center">
+             <button class="btn btn-default" onclick="edit()">Submit</button>
+          </div>
+        </div>
+       </div>
+  </div>
+  <% if(user[0].adminCode == process.env.ADMIN && currentUser[0].adminCode == process.env.ADMIN){ %>
+   <div class="col-8" id="vue">
+     <div class="card text-center">
+         <div class="card-header">Self Reminders!</div>
+         <div class="card-body display_remind">
+
+         </div>
+     </div>
+     <div class="card">
+        <div class="card-header">Manager Roles</div>
+        <div class="card-body row d-flex justify-content-center">
+            <a href="/users/<%=user[0].userId%>/manager/assign"><button class="btn btn-default">Assign Shifts</button></a>
+            <button class="btn btn-unique" data-toggle="modal" href="#reminder">Add reminder</button>
+            <button class="btn btn-primary" data-toggle="modal" href="#notice">Public Notice</button>
+            <a href="/users/<%=user[0].userId%>/completetask"><button class="btn btn-default">Task Status</button></a>
+        </div>
+     </div>
+     <div class="modal fade" id="notice" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+         <div class="modal-dialog" role="document">
+           <div class="modal-content">
+             <div class="modal-header text-center">
+               <h4 class="modal-title w-100 font-weight-bold">Notice for everyone</h4>
+                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button>
+             </div>
+             <div class="md-form mb-4 pink-textarea active-pink-textarea-2">
+                 <i class="fas fa-angle-double-right prefix"></i>
+                 <textarea id="form23" class="md-textarea form-control not" rows="3"></textarea>
+                 <label for="form23">Text</label>
+             </div>
+           <div class="d-flex justify-content-center">
+             <button class="btn btn-default" data-dismiss="modal" onclick="notice()">Submit</button>
+           </div>
+           </div>
+         </div>
+     </div>
+     <div class="modal fade" id="reminder" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+         <div class="modal-dialog" role="document">
+           <div class="modal-content">
+             <div class="modal-header text-center">
+               <h4 class="modal-title w-100 font-weight-bold">Self Reminder's</h4>
+                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button>
+             </div>
+             <div class="md-form mb-4 pink-textarea active-pink-textarea-2">
+                 <i class="fas fa-angle-double-right prefix"></i>
+                 <textarea id="form23" class="md-textarea form-control rem" rows="3"></textarea>
+                 <label for="form23">Text</label>
+             </div>
+           <div class="d-flex justify-content-center">
+             <button class="btn btn-default" data-dismiss="modal" onclick="remind()">Submit</button>
+           </div>
+           </div>
+         </div>
+     </div>
+  <% }
+  else {%>
+   <div class="col-8" id="vue">
+     <div class="card">
+        <div class="card-header"><strong>Assigned shifts</strong></div>
+        <div class="card-body text-center">
+           <p v-if="text != '' ">{{text}}</p>
+           <div v-if="text == ''">
+            <table class="table">
+             <thead class="black white-text">
+               <tr>
+                <th scope="col">Days</th>
+                <th scope="col">Task</th>
+                <% if(user[0].userId == currentUser[0].userId) {%>
+                <th scope="col">Task Status</th>
+                <% } %>
+               </tr>
+             </thead>
+             <tbody>
+             <tr v-if="mon != null">
+              <th scope="row">Monday</th>
+               <td v-html="mon"></td>
+               <% if(user[0].userId == currentUser[0].userId) {%>
+               <td><button type="button" class="btn btn-unique btn-rounded btn-sm my-0" v-on:click="complete('Monday')">Mark as Complete</span></button></td>
+               <% } %>
+             </tr>
+             <tr v-if="tue != null">
+               <th scope="row">Tuesday</th>
+               <td v-html="tue"></td>
+               <% if(user[0].userId == currentUser[0].userId) {%>
+               <td><button type="button" class="btn btn-unique btn-rounded btn-sm my-0" v-on:click="complete('Tuesday')">Mark as Complete</span></button></td>
+               <% } %>
+             </tr>
+             <tr v-if="wed != null">
+               <th scope="row">Wednesday</th>
+               <td v-html="wed"></td>
+               <% if(user[0].userId == currentUser[0].userId) {%>
+               <td><button type="button" class="btn btn-unique btn-rounded btn-sm my-0" v-on:click="complete('Wednesday')">Mark as Complete</span></button></td>
+               <% } %>
+             </tr>
+             <tr v-if="thu != null">
+               <th scope="row">Thursday</th>
+               <td v-html="thu"></td>
+               <% if(user[0].userId == currentUser[0].userId) {%>
+               <td><button type="button" class="btn btn-unique btn-rounded btn-sm my-0" v-on:click="complete('Thursday')">Mark as Complete</span></button></td>
+               <% } %>
+             </tr>
+             <tr v-if="fri != null">
+               <th scope="row">Friday</th>
+               <td v-html="fri"></td>
+               <% if(user[0].userId == currentUser[0].userId) {%>
+               <td><button type="button" class="btn btn-unique btn-rounded btn-sm my-0" v-on:click="complete('Friday')">Mark as Complete</span></button></td>
+               <% } %>
+             </tr>
+             </tbody>
+            </table>
+           </div>
+        <% if(user[0].userId == currentUser[0].userId){ %>
+           <button v-if="text == ''" data-toggle="modal" data-target="#emnotif" class="btn btn-sm btn-cyan float-right text-white">Email notification</button>
+        <% } %>
+        </div>
+     </div>
+    <% if(user[0].userId == currentUser[0].userId){ %>
+     <div class="modal fade" id="emnotif" tabindex="-1" role="dialog" aria-hidden="true">
+         <div class="modal-dialog" role="document">
+           <div class="modal-content">
+             <div class="modal-header text-center">
+               <h4 class="modal-title w-100 font-weight-bold">Set Email notifications</h4>
+                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button>
+             </div>
+             <div class="modal-body mx-3">
+            <div class="md-form mb-5">
+             <i class="fas fa-user prefix grey-text"></i>
+             <input type="email" id="em" value="<%=currentUser[0].email%>" class="form-control validate">
+             <label data-error="wrong" data-success="right" for="em">Your email</label>
+           </div>
+           </div>
+          <div class="modal-footer d-flex justify-content-center">
+           <button class="btn btn-default" data-dismiss="modal" onclick="notif()">Send &#160;&#160;<i class="fas fa-paper-plane"></i></button>
+       </div>
+      </div>
+    </div>
+  </div>
+  <% } %>
+      <div class="card">
+        <div class="card-header">
+            <strong>Availability / Tasks</strong>
+        </div>
+        <div class="card-body text-center">
+         <p v-if="text1 != '' ">{{text1}}</p>
+         <table v-if=" text1 == '' " class="table">
+             <thead class="black white-text">
+               <tr>
+                <th scope="col">Days</th>
+                <th scope="col">Availability</th>
+                <th scope="col">Preferred Task</th>
+               </tr>
+             </thead>
+             <tbody>
+             <tr v-if="mon_a != '' ">
+              <th scope="row">Monday</th>
+               <td v-html="mon_a"></td>
+               <td v-html="task"></td>
+             </tr>
+             <tr v-if="tue_a != '' ">
+              <th scope="row">Tuesday</th>
+               <td v-html="tue_a"></td>
+               <td v-html="task"></td>
+             </tr>
+             <tr v-if="wed_a != '' ">
+              <th scope="row">Wednesday</th>
+               <td v-html="wed_a"></td>
+               <td v-html="task"></td>
+             </tr>
+             <tr v-if="thu_a != '' ">
+              <th scope="row">Thursday</th>
+               <td v-html="thu_a"></td>
+               <td v-html="task"></td>
+             </tr>
+             <tr v-if="fri_a != '' ">
+              <th scope="row">Friday</th>
+               <td v-html="fri_a"></td>
+               <td v-html="task"></td>
+             </tr>
+        </table>
+        <% if(user[0].userId == currentUser[0].userId){ %>
+            <a href="/users/<%=user[0].userId%>/ava" class="btn btn-primary">Change my availability</a>
+        <% } %>
+           </div>
+        </div>
+     </div>
+    </div>
+    <% } %>
+ </div>
+</div>
+
+<script>
+
+    function edit() {
+             var first = document.querySelector("#first").value;
+             var last  = document.querySelector("#last").value;
+             var email = document.querySelector("#email").value;
+             var admin = document.querySelector("#ac").value;
+             var b     = document.querySelector("#bio").value;
+             var bio   = b.replace(/(?:\r\n|\r|\n)/g, '<br>');
+             var xhttp = new XMLHttpRequest();
+             xhttp.open('PUT', "/users/<%=currentUser[0].userId %>/update");
+             xhttp.onreadystatechange = function(){
+             if(this.readyState ==4 && this.status == 200) {
+                   window.location.href = "https://a3cadd84-decc-4b69-b167-d074f274aa24-ide.cs50.xyz/users/<%=currentUser[0].userId%>"
+                 }
+             };
+            xhttp.setRequestHeader("Content-type", "application/json");
+            xhttp.send(JSON.stringify({ firstName:first , lastName:last, email:email, bio:bio, admin:admin }));
+          }
+
+   function notif(){
+          var email  = document.querySelector("#em").value;
+
+          var xhttp = new XMLHttpRequest();
+             xhttp.open('POST', "/users/<%=currentUser[0].userId %>/notification");
+             xhttp.onreadystatechange = function(){
+             if(this.readyState ==4 && this.status == 400) {
+                  window.location.href = "https://a3cadd84-decc-4b69-b167-d074f274aa24-ide.cs50.xyz/users/<%=currentUser[0].userId%>"
+                 }
+             else if(this.readyState ==4 && this.status == 200) {
+                  window.location.href = "https://a3cadd84-decc-4b69-b167-d074f274aa24-ide.cs50.xyz/users/<%=currentUser[0].userId%>"
+                 }
+             };
+            xhttp.setRequestHeader("Content-type", "application/json");
+            xhttp.send(JSON.stringify({ email:email }));
+            email='';
+        }
+
+     function remind(){
+         var remind = $('.rem').val();
+         var selfremind = remind.replace(/(?:\r\n|\r|\n)/g, '<br>');
+
+         var xhttp = new XMLHttpRequest();
+             xhttp.open('POST', "/users/<%=currentUser[0].userId %>/remind");
+             xhttp.onreadystatechange = function(){
+             if(this.readyState ==4 && this.status == 200) {
+                  window.location.href = "https://a3cadd84-decc-4b69-b167-d074f274aa24-ide.cs50.xyz/users/<%=currentUser[0].userId%>"
+                 }
+             };
+            xhttp.setRequestHeader("Content-type", "application/json");
+            xhttp.send(JSON.stringify({ remind:selfremind }));
+
+     }
+
+     function notice(){
+         var notice = $('.not').val();
+         var note = notice.replace(/(?:\r\n|\r|\n)/g, '<br>');
+         var xhttp = new XMLHttpRequest();
+             xhttp.open('POST', "/users/<%=currentUser[0].userId %>/notice");
+             xhttp.onreadystatechange = function(){
+             if(this.readyState ==4 && this.status == 200) {
+                  window.location.href = "https://a3cadd84-decc-4b69-b167-d074f274aa24-ide.cs50.xyz/users/<%=currentUser[0].userId%>"
+                 }
+             };
+            xhttp.setRequestHeader("Content-type", "application/json");
+            xhttp.send(JSON.stringify({ notice:note }));
+     }
+
+     $(document).ready(function(){
+       var xhttp2 = new XMLHttpRequest();
+                 var arr1=[];
+                 xhttp2.open('GET', "/users/"+ <%=currentUser[0].userId %> +"/remind");
+                 xhttp2.onreadystatechange = function (){
+                 if (this.readyState == 4 && this.status == 200) {
+
+                    arr1 = JSON.parse(this.response);
+                    $('.display_remind').html(arr1[0].adminnotice);
+                }
+             }
+            xhttp2.send();
+  });
+
+  var app = new Vue({
+                el: '#vue',
+                data: {
+                    arr:[],
+                    mon:'',
+                    tue:'',
+                    wed:'',
+                    thu:'',
+                    fri:'',
+                    mon_a:'',
+                    tue_a:'',
+                    wed_a:'',
+                    thu_a:'',
+                    fri_a:'',
+                    task:'',
+                    text:'',
+                    text1:''
+                },
+                mounted:function(){
+              <% if(currentUser[0].adminCode != process.env.ADMIN){ %>
+                 this.showtask(), //method1 will execute at pageload
+                 this.showava()
+              <% } %>
+                },
+                methods: {
+              <% if(currentUser[0].adminCode != process.env.ADMIN){ %>
+                  showtask: function(){
+                        var xhttp1 = new XMLHttpRequest();
+                        xhttp1.open('GET', "/users/" +<%=currentUser[0].userId %>+"/shifts", true);
+                        xhttp1.onreadystatechange = function(){
+                        if(this.readyState ==4 && this.status == 200) {
+                        app.arr = JSON.parse(this.responseText);
+                           // console.log(app.arr);
+                           if(app.arr.length == 0){
+                             app.text = "No Shifts assigned to you yet !";
+                           }
+                           else{
+                           app.mon = app.arr[0].Monday;
+                           app.tue = app.arr[0].Tuesday;
+                           app.wed = app.arr[0].Wednesday;
+                           app.thu = app.arr[0].Thursday;
+                           app.fri = app.arr[0].Friday;
+                          }
+                    }
+                  }
+                  xhttp1.send();
+                },
+                showava: function(){
+                 var xhttp1 = new XMLHttpRequest();
+                 xhttp1.open('GET', "/users/"+<%=currentUser[0].userId %> +"/availability", true);
+                 xhttp1.onreadystatechange = function (){
+                 if (this.readyState == 4 && this.status == 200) {
+                      app.arr1 = JSON.parse(this.responseText);
+                      if( app.arr1.length == 0 ){
+                       app.text1 = "No availability set yet. Please set it by clicking on the buutton below";
+                      }
+                      else{
+                      // console.log(app.arr1);
+                      app.mon_a = app.arr1[0].mon;
+                      app.tue_a = app.arr1[0].tue;
+                      app.wed_a = app.arr1[0].wed;
+                      app.thu_a = app.arr1[0].thu;
+                      app.fri_a = app.arr1[0].fri;
+
+                      if (app.arr1[0].task1 == '' && app.arr1[0].task2 == ''){
+                        app.task = app.arr1[0].task3;
+                      }
+                      else if (app.arr1[0].task1 == '' && app.arr1[0].task3 == ''){
+                        app.task = app.arr1[0].task2;
+                      }
+                      else if (app.arr1[0].task2 == '' && app.arr1[0].task3 == ''){
+                        app.task = app.arr1[0].task1;
+                      }
+                      else if(app.arr1[0].task1 == ''){
+                        app.task = app.arr1[0].task2 + "<br>" + app.arr1[0].task3;
+                      }
+                      else if(app.arr1[0].task2 == ''){
+                        app.task = app.arr1[0].task1 + "<br>" + app.arr1[0].task3;
+                      }
+                      else if(app.arr1[0].task3 == ''){
+                        app.task = app.arr1[0].task1 + "<br>" + app.arr1[0].task2;
+                      }
+                      else if(app.arr1[0].task1 != '' && app.arr1[0].task2 != '' && app.arr1[0].task3 != ''){
+                        app.task = app.arr1[0].task1 + "<br>" + app.arr1[0].task2 + "<br>" + app.arr1[0].task3;
+                      }
+                    }
+                  }
+                }
+              xhttp1.send();
+              },
+
+                 complete: function(i){
+
+                    var xhttp = new XMLHttpRequest();
+                        xhttp.open('POST', "/users/<%=user[0].userId%>/complete");
+                        xhttp.onreadystatechange = function(){
+                        if(this.readyState ==4 && this.status == 200) {
+                          window.location.href = "https://a3cadd84-decc-4b69-b167-d074f274aa24-ide.cs50.xyz/users/<%=user[0].userId%>";
+                       }
+                       else if(this.readyState ==4 && this.status == 400){
+                          window.location.href = "https://a3cadd84-decc-4b69-b167-d074f274aa24-ide.cs50.xyz/login";
+                       }
+                   };
+                 xhttp.setRequestHeader("Content-type", "application/json");
+                 xhttp.send(JSON.stringify({ day:i }));
+                 }
+               <% } %>
+              }
+
+           });
+</script>
+<%- include('./partials/footer') %>
